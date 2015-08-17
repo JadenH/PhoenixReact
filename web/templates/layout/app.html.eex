@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Hello Phoenix!</title>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+  </head>
+
+  <body>
+    <%= @inner %>
+    <script>window.userToken = "<%= assigns[:user_token] %>";</script>
+    <%= if Mix.env == :dev do %>
+      <script src='http://localhost:3000/bundle.js'></script>
+    <% else %>
+      <script src="<%= static_path(@conn, "/js/bundle.js") %>"></script>
+    <% end %>
+  </body>
+</html>
