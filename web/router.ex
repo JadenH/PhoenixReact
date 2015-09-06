@@ -9,18 +9,13 @@ defmodule PhoenixReact.Router do
     plug :put_secure_browser_headers
   end
 
+  scope "/", PhoenixReact do
+    pipe_through :browser # Use the default browser stack
+    get "/", PageController, :index
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/", PhoenixReact do
-    pipe_through :browser # Use the default browser stack
-
-    get "/", PageController, :index
-  end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", PhoenixReact do
-  #   pipe_through :api
-  # end
 end
