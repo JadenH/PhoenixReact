@@ -35,6 +35,7 @@ defmodule PhoenixReact.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:phoenix_html, "~> 2.0"},
      {:phoenix_live_reload, "~> 0.6", only: :dev},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:guardian, "~> 0.6.1"}]
   end
 end

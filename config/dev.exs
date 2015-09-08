@@ -2,11 +2,12 @@ use Mix.Config
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
-#
+
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 #"node_modules/webpack/bin/webpack.js"
+# Disabled brunch in favor of webpack.
 config :phoenixReact, PhoenixReact.Endpoint,
   http: [port: 4000],
   debug_errors: true,
@@ -15,6 +16,7 @@ config :phoenixReact, PhoenixReact.Endpoint,
   # watchers: [{Path.expand("webpack.devserver.js"), ["--watch", "--colors", "--progress"]}]
 
 # Watch static and templates for browser reloading.
+# Disabled live reload of static folder. Webpack will handle this for us.
 config :phoenixReact, PhoenixReact.Endpoint,
   live_reload: [
     patterns: [

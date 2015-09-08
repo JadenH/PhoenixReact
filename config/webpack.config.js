@@ -9,14 +9,14 @@ const PHOENIX_PORT = 4000;
 var publicPath = 'http://localhost:' + APP_PORT + '/'
 
 var env = process.env.MIX_ENV || 'dev'
-var prod = env === 'prod'
+var release = env === 'prod'
 
 var entry = './web/static/js/app.jsx'
 
 //############### LOADERS ##########
 var autoprefix = '{browsers:["Android 2.3", "Android >= 4", "Chrome >= 20", "Firefox >= 24", "Explorer >= 8", "iOS >= 6", "Opera >= 12", "Safari >= 6"]}';
 
-var jsLoaders = ["babel-loader?stage=0"];
+var jsLoaders = ["babel-loader?stage=0&optional=runtime"]; // include the runtime
 
 var cssLoaders = ['style-loader', 'css-loader', 'autoprefixer-loader?' + autoprefix];
 
@@ -28,7 +28,7 @@ var lessLoaders = cssLoaders.slice(0);
 
 //############### LOADERS ##########
 
-if (!prod) {
+if (!release) {
   console.log("Enable React Hot Loader")
   jsLoaders.unshift("react-hot-loader");
 }
@@ -37,8 +37,7 @@ module.exports = {
   phoenix_port: PHOENIX_PORT,
   app_port: APP_PORT,
   // graphql_port: GRAPHQL_PORT, #Relay
-  devtool: prod ? null : 'eval-sourcemaps',
-  entry: prod ? entry : [
+  entry: release ? entry : [
     'webpack-dev-server/client?' + publicPath,
     'webpack/hot/only-dev-server',
     entry
@@ -52,8 +51,14 @@ module.exports = {
     extensions: ['', '.js', '.json', '.jsx'],
     modulesDirectories: ["node_modules", "vendor"]
   },
-  plugins: prod ? [
-    new webpack.DefinePlugin({'process.env.NODE_ENV': '"production"'}),
+  cache: true,
+  quiet: false,
+  noInfo: false,
+  debug: false,
+  outputPathinfo: !release,
+  devtool: release ? false : "eval",  // http://webpack.github.io/docs/configuration.html#devtool
+  plugins: release ? [
+    new webpack.DefinePlugin({'process.env.NODE_ENV': '"releaseuction"'}),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
