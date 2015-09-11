@@ -22,8 +22,10 @@ class Register extends BaseComponent {
 
   handleRegister(formData){
     UserActions.register({
-      email: formData.email,
-      password: formData.password
+      user: {
+        email: formData.email,
+        password: formData.password
+      }
     });
   }
 

@@ -27,13 +27,16 @@ defmodule PhoenixReact.Router do
     get "/", PageController, :index
   end
 
-  scope "/api", PhoenixReact do
+  scope "/api", PhoenixReact.Api do
     pipe_through :api
+
     get "/", PageController, :index
     get "/login", SessionController, :new, as: :login
     post "/login", SessionController, :create, as: :login
     delete "/logout", SessionController, :delete, as: :logout
     get "/logout", SessionController, :delete, as: :logout
+
+    resources "/users", UserController
   end
 
   # ------------------------------------------------------------------------------
