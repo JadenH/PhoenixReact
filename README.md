@@ -17,3 +17,9 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
   * Docs: http://hexdocs.pm/phoenix
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
+
+##Debugging
+
+  1. Require IEx in the script you wish to debug: `Require IEx `
+  2. Run server using: `IEx -S mix phoenix.server `
+  3. Use `IEx.pry ` to inspect inline.

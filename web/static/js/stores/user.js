@@ -13,7 +13,7 @@ function login(payload){
   _user.email = payload.data.body.email;
   _user.displayName = payload.data.body.displayName;
   // We get a JWT back.
-  var jwt = payload.data.body.jwt_token;
+  var jwt = payload.data.body.jwt;
   localStorage.setItem('jwt', jwt);
   logoutState = 1;
 }
@@ -22,6 +22,7 @@ function login(payload){
 function register(user){
   _user.email = user.email;
   _user.displayName = user.displayName;
+  _user.jwt = user.jwt;
 }
 
 function loadUserFromSettings(payload) {
@@ -31,7 +32,7 @@ function loadUserFromSettings(payload) {
 
 function logout(){
   localStorage.removeItem('jwt');
-  logoutState = 2;
+  _user.jwt = null;
 }
 
 // Extend User Store with EventEmitter to add eventing capabilities
@@ -43,15 +44,15 @@ var UserStore = assign({}, StoreCommon, {
   },
 
   loggedIn(){
-    return localStorage.getItem('jwt') !== null;
+    return _user.jwt || localStorage.getItem('jwt') !== null;
+  },
+
+  loggedOut(){
+    return _user.jwt == null && localStorage.getItem('jwt') == null;
   },
 
   jwt(){
-    return localStorage.getItem('jwt');
-  },
-
-  logoutStatus(){
-    return logoutState;
+    return _user.jwt || localStorage.getItem('jwt');
   }
 
 });
@@ -69,7 +70,7 @@ Dispatcher.register((payload) => {
 
     // Respond to REGISTER action
     case Constants.REGISTER:
-      register(payload.user);
+      register(payload.data.body.user);
       break;
 
     case Constants.LOGOUT:

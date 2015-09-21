@@ -5,35 +5,34 @@ defmodule PhoenixReact.Api.SessionController do
   alias PhoenixReact.UserQuery
 
   plug :scrub_params, "user" when action in [:create]
-  plug :action
 
-  def new(conn, params) do
-    changeset = User.login_changeset(%User{})
-    render(conn, PhoenixReact.SessionView, "new.html", changeset: changeset)
-  end
+  # def new(conn, params) do
+  #   changeset = User.login_changeset(%User{})
+  #   render(conn, PhoenixReact.SessionView, "new.html", changeset: changeset)
+  # end
 
   def create(conn, params = %{}) do
     user = Repo.one(UserQuery.by_email(params["user"]["email"] || ""))
     if user do
       changeset = User.login_changeset(user, params["user"])
       if changeset.valid? do
-        conn
-        |> put_flash(:info, "Logged in.")
-        |> Guardian.Plug.sign_in(user, :token, perms: %{ default: Guardian.Permissions.max })
-        |> redirect(to: user_path(conn, :index))
+        jwt = elem(Guardian.encode_and_sign(user, :token),1)
+        # perms: %{ default: Guardian.Permissions.max }
+        json(conn, %{user: %{jwt: jwt, email: user.email, displayName: user.name}})
       else
-        render(conn, "new.html", changeset: changeset)
+        conn
+        |> put_status(400)
+        |> json(%{user: changeset})
       end
     else
-      changeset = User.login_changeset(%User{}) |> Ecto.Changeset.add_error(:login, "not found")
-      render(conn, "new.html", changeset: changeset)
+      conn
+      |> put_status(400)
+      |> json(%{user: "not found"})
     end
   end
 
   def delete(conn, _params) do
-    Guardian.Plug.sign_out(conn)
-    |> put_flash(:info, "Logged out successfully.")
-    |> redirect(to: "/")
+    json(conn, %{info: "Logged out successfully."})
   end
 
   def unauthenticated_api(conn, _params) do

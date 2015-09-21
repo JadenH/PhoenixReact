@@ -19,7 +19,7 @@ defmodule PhoenixReact.Mixfile do
   def application do
     [mod: {PhoenixReact, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger,
-                    :phoenix_ecto, :postgrex]]
+                    :phoenix_ecto, :postgrex, :comeonin]]
   end
 
   # Specifies which paths to compile per environment
@@ -36,6 +36,7 @@ defmodule PhoenixReact.Mixfile do
      {:phoenix_html, "~> 2.0"},
      {:phoenix_live_reload, "~> 0.6", only: :dev},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.6.1"}]
+     {:guardian, "~> 0.6.2"},
+     {:comeonin, "~> 1.1"}]
   end
 end

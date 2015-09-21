@@ -16,14 +16,13 @@ function loadSettings(defaultSettings){
     return defaultSettings[settings_prop] || QueryString.params()[params_prop] || default_prop;
   };
 
-  var jwt = (defaultSettings.jwt && defaultSettings.jwt.length) ? defaultSettings.jwt : null;
-  if(jwt!==null) {
-    localStorage.setItem('jwt', jwt);
-  } else {
-    localStorage.removeItem('jwt');
-  }
+  // var jwt = (defaultSettings.jwt && defaultSettings.jwt.length) ? defaultSettings.jwt : null;
+  // if(jwt!==null) {
+  //   localStorage.setItem('jwt', jwt);
+  // } else {
+  //   localStorage.removeItem('jwt');
+  // }
 
-  debugger
   _settings = {
     apiUrl           : defaultSettings.api_url || "/",
     csrfToken        : defaultSettings.csrfToken || null
@@ -31,6 +30,13 @@ function loadSettings(defaultSettings){
 
 }
 
+function updateJWT(jwt) {
+  if(jwt != null) {
+    localStorage.setItem('jwt', jwt);
+  } else {
+    localStorage.removeItem('jwt');
+  }
+}
 
 // Extend Message Store with EventEmitter to add eventing capabilities
 var SettingsStore = assign({}, StoreCommon, {
@@ -50,6 +56,10 @@ Dispatcher.register(function(payload) {
     // Respond to TIMEOUT action
     case Constants.SETTINGS_LOAD:
       loadSettings(payload.data);
+      break;
+
+    case Constants.REGISTER:
+      updateJWT(payload.data.body.user.token);
       break;
 
     default:
