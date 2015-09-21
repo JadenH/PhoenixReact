@@ -3,46 +3,67 @@
 import React        from 'react';
 import { Link }     from 'react-router';
 import Validator    from "validator";
+import UserStore    from "../../stores/user";
 import UserActions  from "../../actions/user";
 import _            from "lodash";
 import assign       from "object-assign";
 import { Paper, TextField, FlatButton, RaisedButton, FontIcon } from "material-ui";
 import AtomicForm   from "atomic-form";
 import BaseComponent from "../base_component";
+import Defines       from "../defines";
 
 class Register extends BaseComponent {
 
-  constructor(){
-    super()
-    this._bind('onInputChange', 'validationMessage', 'onInputChange')
-    this.state = {
-      validations: {}
+  constructor(props, context){
+    super(props, context)
+    this.stores = [UserStore]
+    this._bind('onInputChange', 'validationMessage', 'onInputChange', 'afterValidation')
+    this.state = this.getState();
+    if(this.state.loggedIn) {
+      this.context.history.pushState(null, `/dashboard`);
+    }
+  }
+
+  getState() {
+    return {
+      loggedIn: UserStore.loggedIn()
     };
+  }
+
+  storeChanged() {
+    if (UserStore.loggedIn()) {
+      this.context.history.pushState(null, `/dashboard`);
+    }
   }
 
   handleRegister(formData){
     UserActions.register({
       user: {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        name: formData.displayName
       }
     });
   }
 
-  onInputChange() {
+  onInputChange(e, ref) {
     var formData = this.refs.MainForm.formData();
     var formValidations = this.refs.MainForm.validateForm(formData);
-    this.setState({validations: formValidations});
+    var validations = this.state.validations || {};
+    validations[ref] = formValidations[ref];
+    this.setState({validations: validations});
   }
 
   getStyles(){
     return {
       register: {
         width: "400px",
-        margin: "5% auto"
+        margin: "5% auto",
+        backgroundColor: Defines.colors.white,
       },
       signUpButton: {
-        marginTop: "20px"
+        marginTop: "20px",
+        backgroundColor: Defines.colors.teal
       }
     };
   }
@@ -64,13 +85,13 @@ class Register extends BaseComponent {
     var res = {};
     if (this.state.validations && this.state.validations[field]) {
       if (!this.state.validations[field].isValid) {
-        res[field] = this.state.validations[field].message[0];
+        res = this.state.validations[field].message[0];
         return res;
       }
     }
-    res[field] = "";
-    return res;
+    return null;
   }
+
 
   render(){
     var styles = this.getStyles();
@@ -78,20 +99,31 @@ class Register extends BaseComponent {
       <Paper style={styles.register}>
         <h1><span className="fa fa-sign-in"></span> Signup</h1>
         <AtomicForm ref="MainForm" doSubmit={this.handleRegister} afterValidation={this.afterValidation} collectFormData={this.collectFormData}>
-          <TextField hintText="johndoe@example.com" floatingLabelText="Email" errorText={this.validationMessage("email")} ref="email" onBlur={(e) => this.onInputChange(e)} validate={[
+          <TextField hintText="johndoe@example.com" floatingLabelText="Email" errorText={this.validationMessage("email")} ref="email" onBlur={(e) => this.onInputChange(e, 'email')} validate={[
             {
               message: "Must be a valid Email.",
               validate: "isEmail",
             }
             ]}/>
-          <TextField type="password" hintText="******" floatingLabelText="Password" errorText={this.validationMessage("password")} ref="password" onBlur={(e) => this.onInputChange(e)} validate={[
+          <TextField hintText="" floatingLabelText="Display Name" errorText={this.validationMessage("displayName")} ref="displayName" onBlur={(e) => this.onInputChange(e, 'displayName')} validate={[
+            {
+              message: "Cannot contain spaces.",
+              validate: (val) => { return !/\s/.test(val)}
+            },
+            {
+              message: "Name must be at least 3 characters.",
+              validate: "isLength",
+              args: [3]
+            }
+            ]}/>
+          <TextField type="password" hintText="******" floatingLabelText="Password" errorText={this.validationMessage("password")} ref="password" onBlur={(e) => this.onInputChange(e, 'password')} validate={[
             {
               message: "Password must be atleast 5 characters.",
               validate: "isLength",
               args: [5]
             }
             ]}/>
-          <TextField type="password" hintText="******" floatingLabelText="Confirm Password" errorText={this.validationMessage("confirmPassword")} ref="confirmPassword" onBlur={(e) => this.onInputChange(e)} validate={[
+          <TextField type="password" hintText="******" floatingLabelText="Confirm Password" errorText={this.validationMessage("confirmPassword")} ref="confirmPassword" onBlur={(e) => this.onInputChange(e, 'confirmPassword')} validate={[
             {
               message: "Passwords don't match.",
               validate: (val, formData) => { return val == formData.password}
@@ -100,11 +132,16 @@ class Register extends BaseComponent {
           <RaisedButton style={styles.signUpButton} label="Signup" primary={true} type="submit"/>
         </AtomicForm>
         <p>
-          Already have an account? <Link to="login">Login</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </Paper>
     </div>);
   }
 }
+
+Register.contextTypes = {
+  history: React.PropTypes.object.isRequired
+};
+
 
 module.exports = Register;

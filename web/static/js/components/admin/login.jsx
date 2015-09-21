@@ -1,14 +1,16 @@
 "use strict";
 
+import { Paper, TextField, FlatButton, RaisedButton, FontIcon } from "material-ui";
+
 import React         from "react";
 import Validator     from "validator";
 import UserActions   from "../../actions/user";
 import UserStore     from "../../stores/user";
+import AtomicForm    from "atomic-form";
 import BaseComponent from "../base_component";
 import _             from "lodash";
 import assign        from "object-assign";
 import Defines       from "../defines";
-import { Paper, TextField, FlatButton, RaisedButton, FontIcon } from "material-ui";
 
 class Login extends BaseComponent {
 
@@ -18,16 +20,15 @@ class Login extends BaseComponent {
     this.stores = [UserStore];
     this.state = this.getState();
 
-    this._bind("handleLogin", "validateAll", "validate", "validateEmail");
+    this._bind('validationMessage', 'onInputChange', 'afterValidation')
     if(this.state.loggedIn) {
-      context.router.transitionTo("home");
+      context.router.transitionTo("dashboard");
     }
   }
 
   getState() {
     return {
-      loggedIn: UserStore.loggedIn(),
-      validations: {}
+      loggedIn: UserStore.loggedIn()
     };
   }
 
@@ -35,44 +36,41 @@ class Login extends BaseComponent {
   storeChanged(){
     super.storeChanged();
     if(this.state.loggedIn) {
-      this.context.router.transitionTo("home");
-      return null;
+      this.context.router.transitionTo("dashboard");
     }
   }
 
-  handleLogin(e){
-    e.preventDefault();
-    if(this.validateAll()){
-      UserActions.login({
-        user: {
-          email: this.refs.email.getValue(),
-          password: this.refs.password.getValue()
-        }
-      });
+  handleSubmit(){
+    UserActions.login({
+      user: {
+        email: formData.email,
+        password: formData.password
+      }
+    });
+  }
+
+  collectFormData(refs) {
+    var formData = {};
+    _.forEach(refs, (val, ref) => {
+      formData[ref] = refs[ref].getValue();
+    }.bind(this));
+    return formData;
+  }
+
+  afterValidation(formValidations) {
+    //Callback after validation fails.
+    this.setState({validations: formValidations});
+  }
+
+  validationMessage(field) {
+    var res = {};
+    if (this.state.validations && this.state.validations[field]) {
+      if (!this.state.validations[field].isValid) {
+        res[field] = this.state.validations[field].message[0];
+        return res;
+      }
     }
-  }
-
-  validateAll(){
-    return _.every([
-      this.validateEmail()
-    ], (v)=> { return v; });
-  }
-
-  validate(isValid, invalidState, emptyState){
-    if(!isValid){
-      this.setState(assign(this.state.validations, invalidState));
-    } else {
-      this.setState(assign(this.state.validations, emptyState));
-    }
-    return isValid;
-  }
-
-  validateEmail(){
-    return this.validate(
-      Validator.isEmail(this.refs.email.getValue()),
-      { email: "Invalid email" },
-      { email: "" }
-    );
+    return null;
   }
 
   getStyles() {
@@ -99,19 +97,20 @@ class Login extends BaseComponent {
 
   render(){
     var styles = this.getStyles();
-    return( 
+    return(
     <div style={styles.container}>
       <h3>Login</h3>
         <Paper style={styles.paper} zDepth={0}>
-          <form style={styles.form} action="/users/sign_in" method="post" onSubmit={(e) => this.handleLogin(e)}>
-            <div>
-              <TextField hintText="johndoe@example.com" floatingLabelText="Email" ref="email" onBlur={this.validateEmail} errorText={this.state.validations.email} />
-              <TextField type="password" hintText="******" floatingLabelText="Password" ref="password" />
-            </div>
-            <div>
-              <FlatButton style={styles.button} label="Login" primary={true} ref="submit-button" />
-            </div>
-          </form>
+          <AtomicForm ref="MainForm" doSubmit={this.handleSubmit} afterValidation={this.afterValidation} collectFormData={this.collectFormData}>
+            <TextField hintText="johndoe@example.com" floatingLabelText="Email" errorText={this.validationMessage("email")} ref="email" onBlur={(e) => this.onInputChange(e, 'email')} validate={[
+              {
+                message: "Must be a valid Email.",
+                validate: "isEmail",
+              }
+              ]}/>
+            <TextField type="password" hintText="******" floatingLabelText="Password" ref="password"/>
+            <RaisedButton style={styles.button} label="Login" primary={true} type="submit"/>
+          </AtomicForm>
         </Paper>
       </div>);
   }

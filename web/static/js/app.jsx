@@ -4,6 +4,7 @@ import React          from 'react';
 import Router         from 'react-router';
 import Routes         from './routes';
 import SettingsAction from './actions/settings';
+import ReactDOM       from 'react-dom';
 
 import ThemeManager   from 'material-ui/lib/styles/theme-manager';
 
@@ -22,8 +23,13 @@ import Socket from "./socket";
 //Can go away when react 1.0 release
 //Check this repo:
 //https://github.com/zilverline/react-tap-event-plugin
-import injectTapEventPlugin from "react-tap-event-plugin";
-injectTapEventPlugin();
+// import injectTapEventPlugin from "react-tap-event-plugin";
+// injectTapEventPlugin();
+
+//Change from using react-tab-event-plugin. See https://github.com/callemall/material-ui/issues/1030
+import EventPluginHub from 'react/lib/EventPluginHub';
+import TapEventPlugin from 'react/lib/TapEventPlugin';
+EventPluginHub.injection.injectEventPluginsByName({ TapEventPlugin });
 
 
 // Set a device type based on window width, so that we can write media queries in javascript
@@ -41,9 +47,13 @@ if (window.matchMedia("(max-width: 639px)").matches){
 // Initialize store singletons
 SettingsAction.load(window.DEFAULT_SETTINGS);
 
-Router.run(Routes, (Handler) => {
-  return React.render(<Handler />, document.body);
-});
+var AppRoutes = new Routes;
+// Router.run(AppRoutes.Routes(), (Handler) => {
+//   return React.render(<Handler />, document.body);
+// });
+
+ReactDOM.render(<Router>{AppRoutes.Routes()}</Router>, document.getElementById('app'))
+
 
 // Router.run(routes, (Handler) => {
 //   return React.render(<Handler routerState={state} deviceType={deviceType} environment="browser" />, document.body);

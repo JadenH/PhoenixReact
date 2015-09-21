@@ -6,64 +6,77 @@ import UserActions   from "../../actions/user";
 import _             from "lodash";
 import assign        from "object-assign";
 import UserStore     from "../../stores/user";
+import AtomicForm    from "atomic-form";
 import BaseComponent from "../base_component";
-import { Link }      from "react-router";
+import { Link, History, Navigation }      from "react-router";
 import { Paper, TextField, FlatButton, RaisedButton, FontIcon } from "material-ui";
 
 class Login extends BaseComponent {
-
   constructor(props, context){
     super(props, context);
 
     this.stores = [UserStore];
     this.state = this.getState();
 
-    this._bind("handleLogin", "validateAll", "validate", "validateEmail");
+    this._bind('validationMessage', 'onInputChange', 'afterValidation')
     if(this.state.loggedIn) {
-      context.router.transitionTo("dashboard");
+      this.context.history.pushState(null, `/dashboard`);
     }
   }
 
   getState() {
     return {
-      loggedIn: UserStore.loggedIn(),
-      validations: {}
+      loggedIn: UserStore.loggedIn()
     };
   }
 
-  handleLogin(e){
-    e.preventDefault();
-    if(this.validateAll()){
-      UserActions.login({
-        user: {
-          email: this.refs.email.getValue(),
-          password: this.refs.password.getValue()
-        }
-      });
+  // Method to update state based upon store changes
+  storeChanged(){
+    super.storeChanged();
+    if(this.state.loggedIn) {
+      this.context.history.pushState(null, `/dashboard`);
     }
   }
 
-  validateAll(){
-    return _.every([
-      this.validateEmail()
-    ], (v)=> { return v; });
+  handleSubmit(formData){
+    UserActions.login({
+      user: {
+        email: formData.email,
+        password: formData.password
+      }
+    });
   }
 
-  validate(isValid, invalidState, emptyState){
-    if(!isValid){
-      this.setState(assign(this.state.validations, invalidState));
-    } else {
-      this.setState(assign(this.state.validations, emptyState));
+  collectFormData(refs) {
+    var formData = {};
+    _.forEach(refs, (val, ref) => {
+      formData[ref] = refs[ref].getValue();
+    }.bind(this));
+    return formData;
+  }
+
+  afterValidation(formValidations) {
+    //Callback after validation fails.
+    this.setState({validations: formValidations});
+  }
+
+  onInputChange(e, ref) {
+    var formData = this.refs.MainForm.formData();
+    var formValidations = this.refs.MainForm.validateForm(formData);
+    var validations = this.state.validations || {};
+    validations[ref] = formValidations[ref];
+    this.setState({validations: validations});
+  }
+
+  validationMessage(field) {
+    var res = {};
+    if (this.state.validations && this.state.validations[field]) {
+      if (!this.state.validations[field].isValid) {
+        res = this.state.validations[field].message[0];
+        return res;
+      }
     }
-    return isValid;
-  }
-
-  validateEmail(e){
-    return this.validate(
-      Validator.isEmail(this.refs.email.getValue()),
-      { email: "Invalid email" },
-      { email: "" }
-    );
+    return null;
   }
 
   getStyles() {
@@ -84,15 +97,18 @@ class Login extends BaseComponent {
   render(){
     return (<div className="login-screen">
       <Paper className="login-paper">
-        <form action="/login" method="post" onSubmit={(e) => this.handleLogin(e)}>
+        <AtomicForm ref="MainForm" doSubmit={this.handleSubmit} afterValidation={this.afterValidation} collectFormData={this.collectFormData}>
           <h4>Login</h4>
-
-          <TextField hintText="johndoe@example.com" floatingLabelText="Email" ref="email" onBlur={this.validateEmail} errorText={this.state.validations.email} />
-          <TextField type="password" hintText="******" floatingLabelText="Password" ref="password" />
-          <Link to="register">Create Account</Link>
-
-          <FlatButton className="login-button" label="Login" primary={true} />
-        </form>
+          <TextField hintText="johndoe@example.com" floatingLabelText="Email" errorText={this.validationMessage("email")} ref="email" onBlur={(e) => this.onInputChange(e, 'email')} validate={[
+            {
+              message: "Must be a valid Email.",
+              validate: "isEmail",
+            }
+            ]}/>
+          <TextField type="password" hintText="******" floatingLabelText="Password" ref="password"/>
+          <Link to="/register">Create Account</Link>
+          <RaisedButton label="Login" primary={true} type="submit"/>
+        </AtomicForm>
       </Paper>
 
       <div className="button-example-container">
@@ -122,7 +138,8 @@ class Login extends BaseComponent {
 }
 
 Login.contextTypes = {
-  router: React.PropTypes.func
+  history: React.PropTypes.object.isRequired,
+  muiTheme: React.PropTypes.object
 };
 
 module.exports = Login;

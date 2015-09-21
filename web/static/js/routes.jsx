@@ -1,8 +1,12 @@
 "use strict";
 
 import React        from 'react';
-import Router       from 'react-router';
+import { Router, Route, Link, IndexRoute } from 'react-router';
 
+import UserStore    from './stores/user';
+import mui          from 'material-ui';
+
+// ------------------ Components --------------------------
 import Index        from './components/index';
 import Home         from './components/main/home';
 import Login        from './components/sessions/login';
@@ -12,23 +16,30 @@ import Dashboard    from './components/main/dashboard';
 import NotFound     from './components/not_found';
 import Connections  from './components/users/connections';
 import About        from './components/main/about';
+// ------------------ Components --------------------------
 
-var Route         = Router.Route;
-var NotFoundRoute = Router.NotFoundRoute;
-var DefaultRoute  = Router.DefaultRoute;
-var Redirect      = Router.Redirect;
+export default class Routes {
 
-var routes = (
-  <Route name="root" path="/" handler={Index}>
-    <DefaultRoute name="home" handler={Home}/>
-    <Route name="login" handler={Login}/>
-    <Route name="register" handler={Register}/>
-    <Route name="logout" handler={Logout}/>
-    <Route name="dashboard" handler={Dashboard}/>
-    <Route name="connections" handler={Connections}/>
-    <Route name="about" handler={About}/>
-    <NotFoundRoute handler={NotFound}/>
-  </Route>
-);
+  requireAuth(nextState, replaceState) {
+    if(!UserStore.loggedIn()){
+      replaceState({ nextPathname: nextState.location.pathname }, '/login');
+    }
+  }
 
-module.exports = routes;
+  Routes() {
+    return(
+      <Route path="/" component={Index}>
+        <IndexRoute component={Home}/>
+        <Route path="login" component={Login}/>
+        <Route path="register" component={Register}/>
+        <Route path="logout" component={Logout}/>
+        <Route path="about" component={About}/>
+        <Route path="dashboard" component={Dashboard} onEnter={this.requireAuth}/>
+        <Route path="connections" component={Connections}/>
+        <Route path="*" component={NotFound}/>
+      </Route>
+    );
+  }
+}
+
+
