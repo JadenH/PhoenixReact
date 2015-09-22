@@ -6,23 +6,15 @@ import StoreCommon    from "./store_common";
 import assign         from "object-assign";
 
 var _user = {};
-var logoutState = 1;
 
 // log the user in
 function login(payload){
-  _user.email = payload.data.body.email;
-  _user.displayName = payload.data.body.displayName;
-  // We get a JWT back.
-  var jwt = payload.data.body.jwt;
-  localStorage.setItem('jwt', jwt);
-  logoutState = 1;
+  _user = payload.data.body.user;
 }
 
 // Register
 function register(user){
-  _user.email = user.email;
-  _user.displayName = user.displayName;
-  _user.jwt = user.jwt;
+  _user = payload.data.body.user;
 }
 
 function loadUserFromSettings(payload) {

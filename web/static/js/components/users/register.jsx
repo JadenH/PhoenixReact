@@ -19,9 +19,6 @@ class Register extends BaseComponent {
     this.stores = [UserStore]
     this._bind('onInputChange', 'validationMessage', 'onInputChange', 'afterValidation')
     this.state = this.getState();
-    if(this.state.loggedIn) {
-      this.context.history.pushState(null, `/dashboard`);
-    }
   }
 
   getState() {
@@ -31,7 +28,17 @@ class Register extends BaseComponent {
   }
 
   storeChanged() {
-    if (UserStore.loggedIn()) {
+    this.setState(this.getState());
+  }
+
+  componentWillMount(){
+    if(this.state.loggedIn) {
+      this.context.history.pushState(null, `/dashboard`);
+    }
+  }
+
+  componentDidUpdate(){
+    if(this.state.loggedIn) {
       this.context.history.pushState(null, `/dashboard`);
     }
   }

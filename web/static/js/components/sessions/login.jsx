@@ -19,9 +19,6 @@ class Login extends BaseComponent {
     this.state = this.getState();
 
     this._bind('validationMessage', 'onInputChange', 'afterValidation')
-    if(this.state.loggedIn) {
-      this.context.history.pushState(null, `/dashboard`);
-    }
   }
 
   getState() {
@@ -32,7 +29,16 @@ class Login extends BaseComponent {
 
   // Method to update state based upon store changes
   storeChanged(){
-    super.storeChanged();
+    this.setState(this.getState());
+  }
+
+  componentWillMount(){
+    if(this.state.loggedIn) {
+      this.context.history.pushState(null, `/dashboard`);
+    }
+  }
+
+  componentDidUpdate(){
     if(this.state.loggedIn) {
       this.context.history.pushState(null, `/dashboard`);
     }

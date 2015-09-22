@@ -59,7 +59,11 @@ Dispatcher.register(function(payload) {
       break;
 
     case Constants.REGISTER:
-      updateJWT(payload.data.body.user.token);
+      updateJWT(payload.data.body.user.jwt);
+      break;
+
+    case Constants.LOGIN:
+      updateJWT(payload.data.body.user.jwt);
       break;
 
     default:
