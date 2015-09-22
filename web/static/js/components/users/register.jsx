@@ -21,9 +21,16 @@ class Register extends BaseComponent {
     this.state = this.getState();
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.props = nextProps;
+    this.setState(this.getState());
+  }
+
   getState() {
+    var nextPathname = this.props.location.state && this.props.location.state.nextPathname
     return {
-      loggedIn: UserStore.loggedIn()
+      loggedIn: UserStore.loggedIn(),
+      nextPathname: nextPathname || '/dashboard'
     };
   }
 
@@ -33,13 +40,13 @@ class Register extends BaseComponent {
 
   componentWillMount(){
     if(this.state.loggedIn) {
-      this.context.history.pushState(null, `/dashboard`);
+      this.context.history.pushState(null, this.state.nextPathname);
     }
   }
 
   componentDidUpdate(){
     if(this.state.loggedIn) {
-      this.context.history.pushState(null, `/dashboard`);
+      this.context.history.pushState(null, this.state.nextPathname);
     }
   }
 
@@ -139,7 +146,7 @@ class Register extends BaseComponent {
           <RaisedButton style={styles.signUpButton} label="Signup" primary={true} type="submit"/>
         </AtomicForm>
         <p>
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/login" state={this.state}>Login</Link>
         </p>
       </Paper>
     </div>);

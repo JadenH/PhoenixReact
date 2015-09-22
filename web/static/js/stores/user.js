@@ -13,7 +13,7 @@ function login(payload){
 }
 
 // Register
-function register(user){
+function register(payload){
   _user = payload.data.body.user;
 }
 
@@ -36,7 +36,7 @@ var UserStore = assign({}, StoreCommon, {
   },
 
   loggedIn(){
-    return _user.jwt || localStorage.getItem('jwt') !== null;
+    return !_.isEmpty(_user.jwt) || !_.isEmpty(localStorage.getItem('jwt'));
   },
 
   loggedOut(){

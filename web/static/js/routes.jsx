@@ -4,7 +4,6 @@ import React        from 'react';
 import { Router, Route, Link, IndexRoute } from 'react-router';
 
 import UserStore    from './stores/user';
-import mui          from 'material-ui';
 
 // ------------------ Components --------------------------
 import Index        from './components/index';
@@ -22,6 +21,9 @@ export default class Routes {
 
   requireAuth(nextState, replaceState) {
     if(!UserStore.loggedIn()){
+      // Redirects the user to sign in. Onced authenticated, we can redirect
+      // to the path they originally were attempting to access by using:
+      // this.props.locations.state.nextPathname
       replaceState({ nextPathname: nextState.location.pathname }, '/login');
     }
   }
@@ -41,5 +43,3 @@ export default class Routes {
     );
   }
 }
-
-

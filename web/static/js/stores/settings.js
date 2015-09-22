@@ -31,7 +31,7 @@ function loadSettings(defaultSettings){
 }
 
 function updateJWT(jwt) {
-  if(jwt != null) {
+  if(jwt !== null) {
     localStorage.setItem('jwt', jwt);
   } else {
     localStorage.removeItem('jwt');

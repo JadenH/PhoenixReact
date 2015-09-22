@@ -21,9 +21,16 @@ class Login extends BaseComponent {
     this._bind('validationMessage', 'onInputChange', 'afterValidation')
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.props = nextProps;
+    this.setState(this.getState());
+  }
+
   getState() {
+    var nextPathname = this.props.location.state && this.props.location.state.nextPathname
     return {
-      loggedIn: UserStore.loggedIn()
+      loggedIn: UserStore.loggedIn(),
+      nextPathname: nextPathname || '/dashboard'
     };
   }
 
@@ -34,13 +41,13 @@ class Login extends BaseComponent {
 
   componentWillMount(){
     if(this.state.loggedIn) {
-      this.context.history.pushState(null, `/dashboard`);
+      this.context.history.pushState(null, this.state.nextPathname);
     }
   }
 
   componentDidUpdate(){
     if(this.state.loggedIn) {
-      this.context.history.pushState(null, `/dashboard`);
+      this.context.history.pushState(null, this.state.nextPathname);
     }
   }
 
@@ -112,7 +119,7 @@ class Login extends BaseComponent {
             }
             ]}/>
           <TextField type="password" hintText="******" floatingLabelText="Password" ref="password"/>
-          <Link to="/register">Create Account</Link>
+          <Link to="/register" state={this.state}>Create Account</Link>
           <RaisedButton label="Login" primary={true} type="submit"/>
         </AtomicForm>
       </Paper>

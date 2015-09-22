@@ -2,7 +2,7 @@
 
 import React          from 'react';
 import Router         from 'react-router';
-import Routes         from './routes';
+import Routes   from './routes';
 import SettingsAction from './actions/settings';
 import ReactDOM       from 'react-dom';
 
@@ -47,12 +47,13 @@ if (window.matchMedia("(max-width: 639px)").matches){
 // Initialize store singletons
 SettingsAction.load(window.DEFAULT_SETTINGS);
 
-var AppRoutes = new Routes;
+// Old Router Code
 // Router.run(AppRoutes.Routes(), (Handler) => {
 //   return React.render(<Handler />, document.body);
 // });
 
-ReactDOM.render(<Router>{AppRoutes.Routes()}</Router>, document.getElementById('app'))
+var App = new Routes;
+ReactDOM.render(<Router>{App.Routes()}</Router>, document.getElementById('app'))
 
 
 // Router.run(routes, (Handler) => {
