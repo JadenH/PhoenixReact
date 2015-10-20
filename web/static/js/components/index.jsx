@@ -8,7 +8,8 @@ import mui            from "material-ui";
 
 var Colors = mui.Styles.Colors;
 var Typography = mui.Styles.Typography;
-var ThemeManager = new mui.Styles.ThemeManager();
+var ThemeManager = mui.Styles.ThemeManager;
+var LightRawTheme = mui.Styles.LightRawTheme;
 
 var { AppCanvas } = mui;
 
@@ -19,18 +20,18 @@ class Index extends React.Component {
 
   getChildContext() {
     return {
-      muiTheme: ThemeManager.getCurrentTheme()
+      muiTheme: ThemeManager.getMuiTheme(LightRawTheme)
     }
   }
 
   render(){
     return (
       <AppCanvas predefinedLayout={1}>
-        <h1>React Starter App</h1>
+        <h1>Phoenix React Starter App</h1>
         {this.props.children}
         <div className="footer">
           <p>
-            Built by <a href="http://www.atomicjolt.com">Atomic Jolt</a>.
+            Assembled by <a href="http://www.jadenholladay.com">Jaden Holladay</a>.
           </p>
         </div>
       </AppCanvas>

@@ -14,7 +14,7 @@ import _                    from "lodash";
 
 var mui = require('material-ui');
 var Typography = mui.Styles.Typography;
-var ThemeManager = new mui.Styles.ThemeManager();
+var ThemeManager = new mui.Styles.ThemeManager;
 var { AppCanvas, AppBar, IconButton, FullWidthSection } = mui;
 
 var { Spacing } = mui.Styles;
