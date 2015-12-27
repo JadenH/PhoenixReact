@@ -2,29 +2,12 @@
 
 import React          from 'react';
 import Router         from 'react-router';
-import Routes   from './routes';
-import SettingsAction from './actions/settings';
+import Routes   from './app_routes';
+import SettingsAction from './app/actions/settings';
 import ReactDOM       from 'react-dom';
 
 import ThemeManager   from 'material-ui/lib/styles/theme-manager';
 
-//---------------- #Relay ----------------------
-//import Relay from 'react-relay';
-// Relay.injectNetworkLayer(
-//   new Relay.DefaultNetworkLayer('http://localhost:4000/graphql')
-// );
-//---------------- #Relay ----------------------
-
-//---------------- WEBSOCKET ----------------------
-import Socket from "./socket";
-//---------------- WEBSOCKET ----------------------
-
-//Needed for onTouchTap
-//Can go away when react 1.0 release
-//Check this repo:
-//https://github.com/zilverline/react-tap-event-plugin
-// import injectTapEventPlugin from "react-tap-event-plugin";
-// injectTapEventPlugin();
 
 //Change from using react-tab-event-plugin. See https://github.com/callemall/material-ui/issues/1030
 import EventPluginHub from 'react/lib/EventPluginHub';
@@ -51,6 +34,8 @@ SettingsAction.load(window.DEFAULT_SETTINGS);
 // Router.run(AppRoutes.Routes(), (Handler) => {
 //   return React.render(<Handler />, document.body);
 // });
+
+import "!style!css!sass!mdi/scss/materialdesignicons.scss";
 
 var App = new Routes;
 ReactDOM.render(<Router>{App.Routes()}</Router>, document.getElementById('app'))

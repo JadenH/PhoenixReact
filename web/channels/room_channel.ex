@@ -1,16 +1,16 @@
-defmodule PhoenixReact.RoomChannel do
+defmodule PhoenixReact.ChatChannel do
   use Phoenix.Channel
 
-  def join("rooms:lobby", auth_msg, socket) do
+  def join("chat:lobby", auth_msg, socket) do
     {:ok, socket}
   end
 
-  def join("rooms:" <> _private_room_id, _auth_msg, socket) do
+  def join("chat:" <> _private_room_id, _auth_msg, socket) do
     {:error, %{reason: "unauthorized"}}
   end
 
   def handle_in("new_msg", %{"body" => body}, socket) do
-    broadcast! socket, "new_msg", %{body: body}
+    broadcast! socket, "new_msg", %{body: body, user: socket.assigns[:name]}
     {:noreply, socket}
   end
 

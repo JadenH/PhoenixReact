@@ -18,16 +18,17 @@ defmodule PhoenixReact.Api.SessionController do
       if changeset.valid? do
         jwt = elem(Guardian.encode_and_sign(user, :token),1)
         # perms: %{ default: Guardian.Permissions.max }
-        json(conn, %{user: %{jwt: jwt, email: user.email, displayName: user.name}})
+        json(conn, %{user: %{jwt: jwt, email: user.email, name: user.name}})
       else
         conn
         |> put_status(400)
-        |> json(%{user: changeset})
+        |> json(%{formError: "Invalid username or password."})
+
       end
     else
       conn
       |> put_status(400)
-      |> json(%{user: "not found"})
+      |> json(%{formError: "Invalid username or password."})
     end
   end
 

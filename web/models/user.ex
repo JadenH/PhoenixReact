@@ -17,7 +17,6 @@ defmodule PhoenixReact.User do
 
   @required_update_fields ~w(password)
   @optional_update_fields ~w(name, email)
-
   @password_min_length 5
 
   before_insert :maybe_update_password
@@ -31,14 +30,14 @@ defmodule PhoenixReact.User do
   def create_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_register_fields, @optional_register_fields)
-    |> validate_unique(:email, on: PhoenixReact.Repo, downcase: true)
+    |> unique_constraint(:email, on: PhoenixReact.Repo, downcase: true)
     |> validate_length(:password, min: @password_min_length)
   end
 
   def update_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_update_fields, @optional_update_fields)
-    |> validate_unique(:email, on: PhoenixReact.Repo, downcase: true)
+    |> unique_constraint(:email, on: PhoenixReact.Repo, downcase: true)
     |> validate_length(:password, min: @password_min_length)
   end
 

@@ -8,12 +8,12 @@ defmodule PhoenixReact.Api.RegistrationsController do
   def update(conn, %{"jwt" => jwt, "user" => user_params}) do
     case Guardian.decode_and_verify(jwt) do
       { :ok, claims } ->
-        case Guardian.serializer.from_token(claims.sub) do
-          { :ok, resource } ->
-            changeset = User.update_changeset(resource, user_params)
+        case Guardian.serializer.from_token(claims["sub"]) do
+          { :ok, user } ->
+            changeset = User.update_changeset(user, user_params)
             if changeset.valid? do
               user = elem(Repo.update(changeset), 1)
-              json(conn, %{user: %{jwt: jwt, email: user.email, displayName: user.name}})
+              json(conn, %{user: %{jwt: jwt, email: user.email, name: user.name}})
             else
               conn
               |> put_status(400)
@@ -37,7 +37,7 @@ defmodule PhoenixReact.Api.RegistrationsController do
       user = elem(Repo.insert(changeset), 1)
       jwt = elem(Guardian.encode_and_sign(user, :token),1)
       # perms: %{ default: Guardian.Permissions.max }
-      json(conn, %{user: %{jwt: jwt, email: user.email, displayName: user.name}})
+      json(conn, %{user: %{jwt: jwt, email: user.email, name: user.name}})
     else
       conn
       |> put_status(400)

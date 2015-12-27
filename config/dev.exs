@@ -32,7 +32,7 @@ config :logger, :console, format: "[$level] $message\n"
 # Configure your database
 config :phoenixReact, PhoenixReact.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "dev",
+  username: "jaden",
   password: "",
   database: "phoenixreact_dev",
   size: 10 # The amount of database connections in the pool
