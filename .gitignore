@@ -4,6 +4,7 @@
 /deps
 /*.ez
 /node_modules
+/npm-debug.log
 
 # Generate on crash by the VM
 erl_crash.dump
@@ -16,5 +17,5 @@ erl_crash.dump
 # variables.
 /config/prod.secret.exs
 
-/npm-debug.log
+# Mac
 .DS_Store
